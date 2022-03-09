@@ -1,0 +1,13 @@
+This document contains notes on generating an html version of the MECORE
+questionnaire based on whatever .tex file we write on Overleaf. That html
+version could contain folds, etc., that improve the legibility or useability of
+the document.
+
+Clone the Overleaf files
+git clone https://git.overleaf.com/61e1c8973b0cbd4c2036bea9 
+
+Strip TeX commands etc. from the tex file
+detex file.tex > output.txt
+
+This would definitely work, but perhaps if I could write my own script, I could
+directly get things like section titles into <h> tags etc.

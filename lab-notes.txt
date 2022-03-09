@@ -1,0 +1,13 @@
+A tex file has:
+a preamble,
+a body,
+commands with arguments,
+commands without arguments,
+environments.
+
+From the preamble, we want to extract title and author information. Then, we can simply delete anything up to "\begin{document}" included and "\end{document}" at the end.
+
+We will want a function that extracts things in curly brackets, but we'll also want to translate things like \textbf into <b>...</b>
+
+Problems:
+	- \ref and \label
