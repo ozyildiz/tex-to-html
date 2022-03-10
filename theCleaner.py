@@ -32,6 +32,8 @@ texPlay = texcontent
 # Function curlyGrab looks at a string and returns its substring contained in
 # (by default:) curly brackets if there is one. Can handle parentheses and
 # square brackets.
+# TODO: This currently doesn't handle commands in other commands.
+# And it doesn't handle multiple commands on the same line.
 def curlyGrab(string, Wrapper='{'): 
     # We could use a dictionary, but they're not symmetric so it won't simplify
     # things?
@@ -46,23 +48,61 @@ def curlyGrab(string, Wrapper='{'):
         closeWrapper = Wrapper
         openWrapper = opens[closes.index(Wrapper)]
     # If there is a substring enclosed in argument parens, return that substring
+    # We need to go down to the character level.
     if openWrapper in string and closeWrapper in string:
         curlyContent = string[string.index(openWrapper)+1:string.index(closeWrapper)]
         return(curlyContent)
     # Else, return the string.
     else: 
-        identity = string
+        identity = ''
         return(identity)
 
+def curlyTwo(string, wo='{', wc='}'):
+    n = 0
+    j = 0
+    k = 0
+    d = [] 
+    l = []
+    splat = [c for c in string]
+    for i in range(len(splat)):
+        if splat[i] == wo:
+            n+=1
+            d.append([n,'o',i])
+        elif splat[i] == wc:
+            d.append([n,'c',i]) 
+            n-=1
+    print(d)
+    while j < len(d):
+        if d[j][0] == d[j+1][0] and d[j][1]=='o' and d[j+1][1]=='c':
+            l.append([d[j][2],d[j+1][2]])
+            d.remove(d[j+1]) # this has to come first, otherwise, you end up trying
+            # to get the second element of a singleton list
+            d.remove(d[j]) 
+        j+=1 
+    while k < len(d):
+        print(k)
+        l.append([d[0][2],d[-1][2]])
+        d.remove(d[-1])
+        d.remove(d[0])
+        k+=1
+    print(d)
+    return(l)
+
+test = "\\textbf{sdf}"
+test2 = "\\textbf{it\\textit{al}ic}"
+test3 = "\\textbf{test}\\testit{adsf}"
+test4 = "\\textbf{test}\\testit{\textbf{\textit{adsf}}adsf}\textit{adsf}"
+
+print(curlyTwo(test4))
 
 # This will take a tag (e.g., b) and some content, and output that content in
 # those tags (e.g., makeTag("i","test") returns "<i>test</i>")
 def makeTag(tag,content):
     return("<"+tag+">"+content+"</"+tag+">")
 
-# Translate latex typesetting commands into HTML tags.
-# We might want to use a dictionary 
-def texToTag(liste):
+# Translate latex typesetting commands into HTML tags. Uses a dictionary.
+# Currently, this doesn't return lines it returns just the tag.
+def texToTag(ligne):
     texDict = {
             "\\textbf": "b",
             "\\textit": "i",
@@ -71,8 +111,17 @@ def texToTag(liste):
             "\\emph": "i"
             }
     for key in texDict.keys():
-        if key in liste:
-            return(makeTag(texDict[key], curlyGrab(liste)))
+        if key in ligne:
+            return(makeTag(texDict[key], curlyGrab(ligne)))
+
+def translate(liste):
+    tempList = []
+    for i in range(len(liste)): 
+        # print(texToTag(liste[i]))
+        tempList.append(texToTag(liste[i])) 
+    return(tempList)
+
+
 
 # print(texToTag("\\section*{test}"))
 
@@ -112,16 +161,34 @@ def noWhitespace(liste):
             tempList.append(' '.join(liste[i].split()))
     return(tempList)
 
-
-def cleanMyInput(liste):
-    return(noWhitespace(noComment(liste)))
-
-
 def newLine(liste):
     tempList = []
     for i in range(len(liste)):
         tempList.append(liste[i]+"<br>\n")
     return(tempList)
+
+def noPreamble(liste):
+    tempList = []
+    beg = 0
+    end = 0
+    for i in range(len(liste)):
+        if "maketitle" in liste[i]: 
+            beg = i
+        elif "end{document}" in liste[i]:
+            end = i
+    tempList = liste[beg+1:end]
+    return(tempList)
+
+def cleanMyInput(liste):
+    tl = []
+    tl = noComment(liste)
+    tl = noPreamble(tl)
+    tl = noWhitespace(tl)
+    tl = newLine(tl)
+    return(tl)
+
+#texPlay=cleanMyInput(texPlay)
+
 
 for i in range(nbegdoc): 
     if "\\title" in texcontent[i]:
@@ -129,7 +196,6 @@ for i in range(nbegdoc):
     if "\\author" in texcontent[i]:
         author = curlyGrab(texcontent[i])
 
-texPlay=newLine(cleanMyInput(texPlay))
 
 ##
 # Grab title and author
