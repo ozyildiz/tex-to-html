@@ -57,6 +57,15 @@ def curlyGrab(string, Wrapper='{'):
         identity = ''
         return(identity)
 
+# This function first counts opening and closing brackets and adds them to a
+# list (d) with the information of whether they match (n), whether they are an
+# opening or a closing bracket, and the position in the line where they occur.
+# Then, it recovers the ranges that fall between two matching brackets. 
+# There are two cases to consider. First, brackets that don't contain other
+# brackets. Here, we pop two consecutive items from d provided that they have
+# the same index n and they are respectively an opening and a closing bracket.
+# The second case is one where brackets do contain other brackets. Here, we pop
+# the first and the last item in d. I can't imagine any other cases.
 def curlyTwo(string, wo='{', wc='}'):
     n = 0
     j = 0
