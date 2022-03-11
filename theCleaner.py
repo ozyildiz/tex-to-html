@@ -57,10 +57,19 @@ def curlyGrab(string, Wrapper='{'):
         identity = ''
         return(identity)
 
-# increment upon encountering ob, keep looking until you find matching cb,
-# extract string, feed leftover to the same function 
-# if running in a loop, you need to specify 'collect=[]' Otherwise, the list
-# will just keep growing.
+# This function takes a line and a list as inputs. It appends the line to the
+# list unchanged if it doesn't contain { and }. Else, it does two things.
+# Encountering an opening bracket increments index n by one. Encountering a
+# closing bracket decrements n by one. If n is then 0, we've encountered
+# outermost brackets. Their inhalts are appended to the list 'collect'. This'll
+# catch any sequence of pairs of brackets that don't contain any other brackets.
+# For pairs of brackets that do contain more brackets, the inhalts first get
+# appended, then we run the same function on that.
+# Note: Collecting outputs in 'tmp' wasn't working (we obtained structure). So
+# we collect outputs in 'collect.' It initializes as [], but it remains as is
+# when the function gets called recursively. If running on a list (for x in
+# list: curlyThree(x)), we have to specify curlyThree(x, []), otherwise collect
+# keeps growing, keeping track of everything that has been appended before.
 def curlyThree(ligne, collect=[], ob='{', cb='}'): 
     # we also need to handle the \{, \} case.
     tmp = []
@@ -68,7 +77,7 @@ def curlyThree(ligne, collect=[], ob='{', cb='}'):
     spligne = [char for char in ligne]
     beg = end = 0
     if ob not in spligne and cb not in spligne: # the no brackets case
-        print(ligne)
+        collect.append(ligne)
     else:
         for i in range(len(spligne)):
             if spligne[i] == ob:
@@ -92,10 +101,10 @@ test="{{1re}1{2re}2op{3eft{4n{6asdf}6}4ight}3ot{5nd}5}"
 test2 = "{out{in}out}"
 test3 = "{out{a{i{{}}n}a}out}"
 test4 = "{s}{d}{{x}}"
-T = [test, test2, test3]
-for t in T:
-    print(curlyThree(t,[])) 
-
+#T = [test, test2, test3]
+#for t in T:
+#    print(curlyThree(t,[])) 
+print(curlyThree('test'))
 
 
 # This will take a tag (e.g., b) and some content, and output that content in
