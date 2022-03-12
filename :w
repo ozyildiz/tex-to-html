@@ -206,16 +206,17 @@ def translate(liste):
         if "begin{itemize}" in line:
             liste[index] = "<ul>"
         elif line[0:5] == "\\item": 
-            pass
-            #while index < len(liste) - 1:
-            #    if "\\item" in liste[index+1] and "itemize" not in liste[index+1]: 
-            #        print("single line!", liste[index])
-            #    elif "\\item" not in liste[index+1] and "itemize" not in liste[index+1]:
-            #        print("multi line!", liste[index:index+2])
-            #    break
+            k = 1
+            while liste[index+k][0:5] != "\\item":
+                #print(index, k, len(liste[index:]), line)
+                k += 1
+            #if liste[index+1][0:5] == "\\item":
+            #    print("good")
+            #else:
+            #    print("bad")
+            #liste[index] = "<li> " + line[6:] + " </li>" 
             """
-            the naive solution didn't handle items with contents on multiple
-            lines. tried a bit, stopped.
+            currently this will not handle items that contain linebreaks 
             """
         elif "end{itemize}" in line:
             liste[index] = "</ul>"
@@ -223,7 +224,7 @@ def translate(liste):
 
 
 texPlay=cleanMyInput(texPlay)
-texPlay=newLine(translate(texPlay[0:30]))
+texPlay=newLine(translate(texPlay[0:10]))
 
 
 for i in range(nbegdoc): 
